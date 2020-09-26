@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "ZeroTube.infrastructure": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
