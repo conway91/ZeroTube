@@ -25,9 +25,9 @@ namespace ZeroTube.infrastructure.services.storage
 
         public void Insert(IList<IModel> models)
         {
-            var bookBatch = _dynamoContext.CreateBatchWrite<IModel>();
-            bookBatch.AddPutItems(models);
-            bookBatch.ExecuteAsync();
+            var modelsBatch = _dynamoContext.CreateBatchWrite<IModel>();
+            modelsBatch.AddPutItems(models);
+            modelsBatch.ExecuteAsync();
         }
 
         public async void Delete(string id)
