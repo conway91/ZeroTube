@@ -9,14 +9,14 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.5.0.20" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.49.0.2106" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lambdas\" />
     <Folder Include="services\" />
     <Folder Include="services\storage\" />
-    <Folder Include="services\storage\models\" />
     <Folder Include="services\storage\DynamoDb\" />
     <Folder Include="services\youtube\" />
-    <Folder Include="services\youtube\models\" />
+    <Folder Include="services\models\" />
   </ItemGroup>
 </Project>

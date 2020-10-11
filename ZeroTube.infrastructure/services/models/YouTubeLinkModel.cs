@@ -1,6 +1,6 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
 
-namespace ZeroTube.infrastructure.services.storage.models
+namespace ZeroTube.infrastructure.services.models
 {
     [DynamoDBTable("YouTubeLink")]
     public class YouTubeLinkModel : IModel

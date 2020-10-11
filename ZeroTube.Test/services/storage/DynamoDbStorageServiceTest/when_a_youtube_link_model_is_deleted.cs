@@ -1,7 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using ZeroTube.infrastructure.services.storage.dynamodb;
-using ZeroTube.infrastructure.services.storage.models;
+using ZeroTube.infrastructure.services.models;
 
 namespace ZeroTube.Test.services.storage.DynamoDbStorageServiceTest
 {

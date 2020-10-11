@@ -1,5 +1,5 @@
 ﻿using System;
-namespace ZeroTube.infrastructure.services.storage.models
+namespace ZeroTube.infrastructure.services.models
 {
 public interface IModel
     {

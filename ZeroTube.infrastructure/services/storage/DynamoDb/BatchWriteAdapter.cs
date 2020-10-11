@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Amazon.DynamoDBv2.DataModel;
-using ZeroTube.infrastructure.services.storage.models;
+using ZeroTube.infrastructure.services.models;
 
 namespace ZeroTube.infrastructure.services.storage.dynamodb
 {

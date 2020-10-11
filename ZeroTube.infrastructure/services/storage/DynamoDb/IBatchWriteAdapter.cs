@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ZeroTube.infrastructure.services.storage.models;
+using ZeroTube.infrastructure.services.models;
 
 namespace ZeroTube.infrastructure.services.storage.dynamodb
 {
