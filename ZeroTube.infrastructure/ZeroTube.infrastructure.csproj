@@ -15,5 +15,6 @@
     <Folder Include="services\" />
     <Folder Include="services\storage\" />
     <Folder Include="services\storage\models\" />
+    <Folder Include="services\storage\DynamoDb\" />
   </ItemGroup>
 </Project>

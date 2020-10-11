@@ -1,7 +1,7 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using ZeroTube.infrastructure.services.storage;
+using ZeroTube.infrastructure.services.storage.dynamodb;
 using ZeroTube.infrastructure.services.storage.models;
 
 namespace ZeroTube.Test.services.storage.DynamoDbStorageServiceTest
@@ -15,8 +15,8 @@ namespace ZeroTube.Test.services.storage.DynamoDbStorageServiceTest
         public new void Setup()
         {
             base.Setup();
-            SetupSaveAsyncMock();
-            _testClient = new DynamoDbStorageService(MockDynamoContext.Object);
+            SetupInsertAsyncMock();
+            _testClient = new DynamoDbStorageService(MockDynamoContext.Object, MockBatchWriteAdapter.Object);
             _testClient.Insert(_modelToInsert);
         }
 

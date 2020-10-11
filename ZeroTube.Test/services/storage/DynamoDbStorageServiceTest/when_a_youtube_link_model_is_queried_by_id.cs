@@ -1,6 +1,6 @@
 using Moq;
 using NUnit.Framework;
-using ZeroTube.infrastructure.services.storage;
+using ZeroTube.infrastructure.services.storage.dynamodb;
 using ZeroTube.infrastructure.services.storage.models;
 
 namespace ZeroTube.Test.services.storage.DynamoDbStorageServiceTest
@@ -16,7 +16,7 @@ namespace ZeroTube.Test.services.storage.DynamoDbStorageServiceTest
         {
             base.Setup();
             SetupLoadAsyncMock();
-            _testClient = new DynamoDbStorageService(MockDynamoContext.Object);
+            _testClient = new DynamoDbStorageService(MockDynamoContext.Object, MockBatchWriteAdapter.Object);
             DynamoLocalStorage.Add(_modelToQuery);
             _queriedOutModel = (YouTubeLinkModel)_testClient.GetById<IModel>(_modelToQuery.Id);
         }
