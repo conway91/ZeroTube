@@ -2,15 +2,17 @@
 using Amazon.DynamoDBv2.DataModel;
 using ZeroTube.infrastructure.services.storage.models;
 
-namespace ZeroTube.infrastructure.services.storage
+namespace ZeroTube.infrastructure.services.storage.dynamodb
 {
     public class DynamoDbStorageService : IStorageService
     {
         private readonly IDynamoDBContext _dynamoContext;
+        private readonly IBatchWriteAdapter _batchWriteAdapter;
 
-        public DynamoDbStorageService(IDynamoDBContext dynamoContext)
+        public DynamoDbStorageService(IDynamoDBContext dynamoContext, IBatchWriteAdapter batchWriteAdapter)
         {
             _dynamoContext = dynamoContext;
+            _batchWriteAdapter = batchWriteAdapter;
         }
 
         public T GetById<T>(string id) where T : IModel
@@ -18,16 +20,14 @@ namespace ZeroTube.infrastructure.services.storage
             return _dynamoContext.LoadAsync<T>(id).Result;
         }
 
-        public async void Insert(IModel model)
+        public async void Insert<T>(T model) where T : IModel
         {
             await _dynamoContext.SaveAsync(model);
         }
 
-        public void Insert(IList<IModel> models)
+        public void MultiInsert<T>(List<T> models) where T : IModel
         {
-            var modelsBatch = _dynamoContext.CreateBatchWrite<IModel>();
-            modelsBatch.AddPutItems(models);
-            modelsBatch.ExecuteAsync();
+            _batchWriteAdapter.BatchInsert(models);
         }
 
         public async void Delete(string id)

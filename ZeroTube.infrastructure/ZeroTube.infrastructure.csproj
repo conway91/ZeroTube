@@ -16,5 +16,7 @@
     <Folder Include="services\storage\" />
     <Folder Include="services\storage\models\" />
     <Folder Include="services\storage\DynamoDb\" />
+    <Folder Include="services\youtube\" />
+    <Folder Include="services\youtube\models\" />
   </ItemGroup>
 </Project>
