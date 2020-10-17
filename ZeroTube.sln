@@ -7,8 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ZeroTube.Deployment ", "Zer
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ZeroTube.Web", "ZeroTube.Web", "{B2D67705-9448-47A4-892B-8F842A58EEFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroTube.Test", "ZeroTube.Test\ZeroTube.Test.csproj", "{74713011-7E5A-4AC4-BCBE-1CDA1AEC07AA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CADEE4DF-7B53-4D7D-A857-3A44E6816470}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
@@ -25,9 +23,5 @@ Global
 		{9620921A-52E1-4C79-8D4A-29E2285D8BBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9620921A-52E1-4C79-8D4A-29E2285D8BBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9620921A-52E1-4C79-8D4A-29E2285D8BBF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{74713011-7E5A-4AC4-BCBE-1CDA1AEC07AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{74713011-7E5A-4AC4-BCBE-1CDA1AEC07AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{74713011-7E5A-4AC4-BCBE-1CDA1AEC07AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{74713011-7E5A-4AC4-BCBE-1CDA1AEC07AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

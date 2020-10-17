@@ -26,6 +26,12 @@ namespace ZeroTube.infrastructure.services.youtube
             var videoIds = GetVideoIdsFromSearchTermAsync(searchTerm).Result;
             var youTubeModels = GetModelsFromVideoIdsAsync(videoIds).Result;
 
+            if (youTubeModels?.Any() != true)
+            {
+                // TODO : Make custom exception
+                throw new Exception("No youtube modles returned");
+            }
+
             return youTubeModels;
         }
 

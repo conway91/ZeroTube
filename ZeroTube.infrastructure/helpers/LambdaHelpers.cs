@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZeroTube.infrastructure.lambdas
+namespace ZeroTube.infrastructure.helpers
 {
     public static class LambdaHelpers
     {

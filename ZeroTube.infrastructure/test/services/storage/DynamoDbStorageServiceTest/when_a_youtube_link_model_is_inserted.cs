@@ -4,7 +4,7 @@ using NUnit.Framework;
 using ZeroTube.infrastructure.services.storage.dynamodb;
 using ZeroTube.infrastructure.services.models;
 
-namespace ZeroTube.Test.services.storage.DynamoDbStorageServiceTest
+namespace ZeroTube.infrastructure.test.services.storage.DynamoDbStorageServiceTest
 {
     public class when_a_model_is_inserted : DynamoDbStorageServiceTestBase
     {
