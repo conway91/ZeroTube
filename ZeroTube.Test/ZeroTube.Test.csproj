@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="lambdas\" />
     <Folder Include="services\" />
     <Folder Include="services\storage\" />
     <Folder Include="services\storage\DynamoDbStorageServiceTest\" />
