@@ -2,7 +2,7 @@
 
 namespace ZeroTube.infrastructure.services.models
 {
-    [DynamoDBTable("YouTubeLink")]
+    [DynamoDBTable("ZeroTubeLinks")]
     public class YouTubeLinkModel : IModel
     {
         [DynamoDBHashKey]

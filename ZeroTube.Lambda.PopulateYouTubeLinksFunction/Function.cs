@@ -20,24 +20,25 @@ namespace ZeroTube.Lambda.PopulateYouTubeLinksFunction
         public void FunctionHandler(ILambdaContext context)
         {
             var searchTerms = LambdaHelpers.GetEnvVar("SEARCH_TERMS");
-            var minimumViewCount = int.Parse(LambdaHelpers.GetEnvVar("MINIMUM_VIEW_COUNT"));
+            var maximumViewCount = int.Parse(LambdaHelpers.GetEnvVar("MAXIMUM_VIEW_COUNT"));
 
             var youTubeService = GetYouTubeApiService();
             var storageService = GetStorageService();
 
             foreach (var searchTerm in searchTerms.Split(','))
             {
-                LambdaLogger.Log($"Querying on search term '{searchTerm}'");
-                var videos = GetYouTubeVideosByView(youTubeService, searchTerm, minimumViewCount);
+                var trimedSearchTerm = searchTerm.Trim();
+                LambdaLogger.Log($"Querying on search term '{trimedSearchTerm}'");
+                var videos = GetYouTubeVideosByView(youTubeService, trimedSearchTerm, maximumViewCount);
                 storageService.MultiInsert(videos);
-                LambdaLogger.Log($"Query and insert complete for '{searchTerm}'");
+                LambdaLogger.Log($"Query and insert complete for '{trimedSearchTerm}'");
             }
         }
 
-        private List<YouTubeLinkModel> GetYouTubeVideosByView(IYouTubeApiService apiService, string searchTerm, int minimumViewCount)
+        private List<YouTubeLinkModel> GetYouTubeVideosByView(IYouTubeApiService apiService, string searchTerm, int maximumViewCount)
         {
             var unfliteredResults = apiService.GetModelsFromSearchTerm(searchTerm);
-            return unfliteredResults.Where(_ => _.ViewCount <= minimumViewCount).ToList();
+            return unfliteredResults.Where(_ => _.ViewCount <= maximumViewCount).ToList();
         }
 
         // TODO : Move to DI
@@ -50,8 +51,9 @@ namespace ZeroTube.Lambda.PopulateYouTubeLinksFunction
         // TODO : Move to DI
         private IStorageService GetStorageService()
         {
-            var awsAcessKey = LambdaHelpers.GetEnvVar("AWS_ACCESS_KEY");
-            var awsSecretAcessKey = LambdaHelpers.GetEnvVar("AWS_SECRET_ACCESS_KEY");
+            // TODO : USE context credentials?
+            var awsAcessKey = LambdaHelpers.GetEnvVar("DYNAMODB_AWS_ACCESS_KEY");
+            var awsSecretAcessKey = LambdaHelpers.GetEnvVar("DYNAMODB_AWS_SECRET_ACCESS_KEY");
             var awsCredentials = new BasicAWSCredentials(awsAcessKey, awsSecretAcessKey);
 
             var dynamoClient = new AmazonDynamoDBClient(awsCredentials);
