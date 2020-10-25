@@ -14,7 +14,6 @@ using ZeroTube.infrastructure.services.youtube;
 
 namespace ZeroTube.Lambda.PopulateYouTubeLinksFunction
 {
-    // TODO : This class needs refactored to be testable and have dependancy injection for storage and api services
     public class Function
     {
         public void FunctionHandler(ILambdaContext context)
@@ -41,17 +40,14 @@ namespace ZeroTube.Lambda.PopulateYouTubeLinksFunction
             return unfliteredResults.Where(_ => _.ViewCount <= maximumViewCount).ToList();
         }
 
-        // TODO : Move to DI
         private YouTubeApiService GetYouTubeApiService()
         {
             var youTubeApiToken = LambdaHelpers.GetEnvVar("YOUTUBE_API_TOKEN");
             return new YouTubeApiService(youTubeApiToken);
         }
 
-        // TODO : Move to DI
         private IStorageService GetStorageService()
         {
-            // TODO : USE context credentials?
             var awsAcessKey = LambdaHelpers.GetEnvVar("DYNAMODB_AWS_ACCESS_KEY");
             var awsSecretAcessKey = LambdaHelpers.GetEnvVar("DYNAMODB_AWS_SECRET_ACCESS_KEY");
             var awsCredentials = new BasicAWSCredentials(awsAcessKey, awsSecretAcessKey);
