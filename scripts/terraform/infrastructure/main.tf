@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "conway-build-artifacts"
+    bucket = "conway-terraform-states"
     key    = "zerotube"
     region = "eu-west-1"
   }
@@ -9,6 +9,18 @@ terraform {
 provider "aws" {
   profile = "default"
   region  = var.aws_region
+}
+
+data "aws_ssm_parameter" "YOUTUBE_API_TOKEN" {
+  name = "/zerotube/YOUTUBE_API_TOKEN"
+}
+
+data "aws_ssm_parameter" "DYNAMODB_AWS_ACCESS_KEY" {
+  name = "/zerotube/DYNAMODB_AWS_ACCESS_KEY"
+}
+
+data "aws_ssm_parameter" "DYNAMODB_AWS_SECRET_ACCESS_KEY" {
+  name = "/zerotube/DYNAMODB_AWS_SECRET_ACCESS_KEY"
 }
 
 resource "aws_dynamodb_table" "basic-dynamodb-table" {
@@ -79,12 +91,21 @@ resource "aws_iam_policy" "lambda_function_iam_role_policy" {
                 "dynamodb:Query",
                 "dynamodb:Scan",
                 "dynamodb:BatchWrite*",
-                "dynamodb:CreateTable",
                 "dynamodb:Delete*",
                 "dynamodb:Update*",
                 "dynamodb:PutItem"
             ],
             "Resource": "arn:aws:dynamodb:*:*:table/ZeroTubeLinks"
+        },
+        {
+            "Sid": "AllowLogging",
+            "Action": [
+                "logs:CreateLogGroup",
+                 "logs:CreateLogStream",
+                 "logs:PutLogEvents"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:*:*:*"
         }
     ]
 }
@@ -104,19 +125,20 @@ variable "artifact_bucket_key" {
 
 resource "aws_lambda_function" "populate_youtube_links_lambda_function" {
   function_name = "populate-youtube-links-lambda-function"
-  s3_bucket     = var.artifact_bucket_name
+  s3_bucket     = "conway-build-artifacts"
   s3_key        = "zerotube/PopulateYouTubeLinksFunction_${var.populate_youtube_links_version}.zip"
   role          = aws_iam_role.lambda_function_iam_role.arn
   handler       = "ZeroTube.Lambda.PopulateYouTubeLinksFunction::ZeroTube.Lambda.PopulateYouTubeLinksFunction.Function::FunctionHandler"
   runtime       = "dotnetcore3.1"
+  timeout       = 120
 
   environment {
     variables = {
-      SEARCH_TERMS               = var.youtube_search_terms
-      MAXIMUM_VIEW_COUNT         = var.youtube_max_view_count
-      YOUTUBE_API_TOKEN          = var.youtube_api_token
-      DYNAMODB_AWS_ACCESS_KEY    = var.aws_access_key
-      DYNAMODB_SECRET_ACCESS_KEY = var.aws_secret_key
+      SEARCH_TERMS                   = var.youtube_search_terms
+      MAXIMUM_VIEW_COUNT             = var.youtube_max_view_count
+      YOUTUBE_API_TOKEN              = data.aws_ssm_parameter.YOUTUBE_API_TOKEN.value
+      DYNAMODB_AWS_ACCESS_KEY        = data.aws_ssm_parameter.DYNAMODB_AWS_ACCESS_KEY.value
+      DYNAMODB_AWS_SECRET_ACCESS_KEY = data.aws_ssm_parameter.DYNAMODB_AWS_SECRET_ACCESS_KEY.value
     }
   }
 

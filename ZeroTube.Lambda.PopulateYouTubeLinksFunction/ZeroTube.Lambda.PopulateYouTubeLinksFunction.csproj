@@ -10,6 +10,8 @@
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="Amazon.Lambda.TestUtilities" Version="1.1.0" />
     <PackageReference Include="Amazon.Core" Version="0.17.2" />
+    <PackageReference Include="AWSSDK.Core" Version="3.5.1.26" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.5.1.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZeroTube.infrastructure\ZeroTube.infrastructure.csproj" />
