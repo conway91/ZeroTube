@@ -8,6 +8,9 @@ namespace ZeroTube.infrastructure.services.models
         [DynamoDBHashKey]
         public string Id { get; set; }
 
+        [DynamoDBRangeKey]
+        public string SortKey { get; set; }
+
         public int ViewCount { get; set; }
     }
 }
