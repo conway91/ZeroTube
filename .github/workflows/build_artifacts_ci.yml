@@ -1,6 +1,6 @@
 name: Build-Artifacts
 
-on: 
+on:
   workflow_dispatch:
     inputs:
         version:
