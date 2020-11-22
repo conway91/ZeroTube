@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Creating PopulateYouTubeLinksFunction Artifact and Pushing to S3
-        run: ./scripts/CreateLambdaArtifacts.sh -l PopulateYouTubeLinksFunction -b conway-build-artifacts -v $INPUT_VERSION
+        run: ./scripts/CreateLambdaArtifacts.sh -l PopulateYouTubeLinksFunction -b conway-build-artifacts -v ${{ github.event.inputs.version }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -40,7 +40,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - id: plan
-        run: terraform plan -no-color -var="populate_youtube_links_version=$INPUT_VERSION"
+        run: terraform plan -no-color -var="populate_youtube_links_version=${{ github.event.inputs.version }}"
         working-directory: ./scripts/terraform/infrastructure
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
