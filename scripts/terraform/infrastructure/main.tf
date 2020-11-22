@@ -1,8 +1,9 @@
 terraform {
   backend "s3" {
-    bucket = "conway-terraform-states"
-    key    = "zerotube"
-    region = "eu-west-1"
+    bucket  = "conway-terraform-states"
+    key     = "zerotube"
+    region  = "eu-west-1"
+    profile = "default"
   }
 }
 

@@ -34,13 +34,13 @@ jobs:
           echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> .aws/credentials
           echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .aws/credentials
 
-      - run: terraform init
+      - run: AWS_PROFILE=default terraform init
         working-directory: ./scripts/terraform/infrastructure
         env:
           AWS_SHARED_CREDENTIALS_FILE: .aws/credentials
 
       - id: plan
-        run: terraform plan -no-color
+        run: AWS_PROFILE=default terraform plan -no-color
         working-directory: ./scripts/terraform/infrastructure
         env:
           AWS_SHARED_CREDENTIALS_FILE: .aws/credentials
