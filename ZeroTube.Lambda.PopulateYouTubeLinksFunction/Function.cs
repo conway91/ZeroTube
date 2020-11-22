@@ -3,7 +3,6 @@ using System.Linq;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.Core;
-using Amazon.Runtime;
 using ZeroTube.infrastructure.helpers;
 using ZeroTube.infrastructure.services.models;
 using ZeroTube.infrastructure.services.storage;
@@ -48,11 +47,7 @@ namespace ZeroTube.Lambda.PopulateYouTubeLinksFunction
 
         private IStorageService GetStorageService()
         {
-            var awsAcessKey = LambdaHelpers.GetEnvVar("DYNAMODB_AWS_ACCESS_KEY");
-            var awsSecretAcessKey = LambdaHelpers.GetEnvVar("DYNAMODB_AWS_SECRET_ACCESS_KEY");
-            var awsCredentials = new BasicAWSCredentials(awsAcessKey, awsSecretAcessKey);
-
-            var dynamoClient = new AmazonDynamoDBClient(awsCredentials);
+            var dynamoClient = new AmazonDynamoDBClient();
             var dynamoContext = new DynamoDBContext(dynamoClient);
             var dynamoBatchAdapter = new BatchWriteAdapter(dynamoContext);
 
