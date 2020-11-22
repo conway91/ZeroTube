@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
+variable "domain_name" {
+  type        = string
+  description = "Domain name for static bucket site"
+  default     = "zerotube.org"
+}
+
 variable "populate_youtube_links_version" {
   type        = string
   description = "Lambda version to deploy for the PopulateYouTubeLinksFunction"
