@@ -11,13 +11,13 @@ esac
 done
 
 echo "Clearing Old Aritfacts"
-rm -rf ../artifacts/*
+rm -rf ./artifacts/*
 
 echo "Building Solution"
-dotnet publish ../ZeroTube.Lambda.${LAMBDA_NAME}/ZeroTube.Lambda.${LAMBDA_NAME}.csproj --configuration Release
+dotnet publish ./ZeroTube.Lambda.${LAMBDA_NAME}/ZeroTube.Lambda.${LAMBDA_NAME}.csproj --configuration Release
 
 echo "Zipping Artifacts"
-cd ../ZeroTube.Lambda.${LAMBDA_NAME}/bin/Release/netcoreapp3.1/publish/
+cd ./ZeroTube.Lambda.${LAMBDA_NAME}/bin/Release/netcoreapp3.1/publish/
 zip -r ${LAMBDA_NAME}.zip *
 
 echo "Pushing Versioned Artifacts to S3"

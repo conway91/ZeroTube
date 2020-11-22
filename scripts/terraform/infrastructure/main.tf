@@ -1,8 +1,9 @@
 terraform {
   backend "s3" {
-    bucket = "conway-terraform-states"
-    key    = "zerotube"
-    region = "eu-west-1"
+    bucket  = "conway-terraform-states"
+    key     = "zerotube"
+    region  = "eu-west-1"
+    profile = "default"
   }
 }
 
@@ -133,12 +134,6 @@ EOF
 resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment" {
   role       = aws_iam_role.lambda_function_iam_role.name
   policy_arn = aws_iam_policy.lambda_function_iam_role_policy.arn
-}
-
-variable "artifact_bucket_key" {
-  type        = string
-  description = "Bucket folder where the zipped artifact exists"
-  default     = "zerotube/PopulateYouTubeLinksFunction_latest.zip"
 }
 
 resource "aws_lambda_function" "populate_youtube_links_lambda_function" {
