@@ -11,36 +11,6 @@ provider "aws" {
   region  = var.aws_region
 }
 
-data "aws_ssm_parameter" "YOUTUBE_API_TOKEN" {
-  name = "/zerotube/YOUTUBE_API_TOKEN"
-}
-
-data "aws_ssm_parameter" "DYNAMODB_AWS_ACCESS_KEY" {
-  name = "/zerotube/DYNAMODB_AWS_ACCESS_KEY"
-}
-
-data "aws_ssm_parameter" "DYNAMODB_AWS_SECRET_ACCESS_KEY" {
-  name = "/zerotube/DYNAMODB_AWS_SECRET_ACCESS_KEY"
-}
-
-resource "aws_s3_bucket" "zerotube-site-logs" {
-  bucket = "${var.domain_name}-site-logs"
-  acl    = "log-delivery-write"
-}
-
-resource "aws_s3_bucket" "zerotube-site" {
-  bucket = "www.${var.domain_name}"
-
-  logging {
-    target_bucket = aws_s3_bucket.zerotube-site-logs.bucket
-    target_prefix = "www.${var.domain_name}/"
-  }
-
-  website {
-    index_document = "index.html"
-  }
-}
-
 resource "aws_dynamodb_table" "basic-dynamodb-table" {
   name         = "ZeroTubeLinks"
   billing_mode = "PAY_PER_REQUEST"
@@ -148,15 +118,14 @@ resource "aws_lambda_function" "populate_youtube_links_lambda_function" {
   role          = aws_iam_role.lambda_function_iam_role.arn
   handler       = "ZeroTube.Lambda.PopulateYouTubeLinksFunction::ZeroTube.Lambda.PopulateYouTubeLinksFunction.Function::FunctionHandler"
   runtime       = "dotnetcore3.1"
-  timeout       = 120
 
   environment {
     variables = {
-      SEARCH_TERMS                   = var.youtube_search_terms
-      MAXIMUM_VIEW_COUNT             = var.youtube_max_view_count
-      YOUTUBE_API_TOKEN              = data.aws_ssm_parameter.YOUTUBE_API_TOKEN.value
-      DYNAMODB_AWS_ACCESS_KEY        = data.aws_ssm_parameter.DYNAMODB_AWS_ACCESS_KEY.value
-      DYNAMODB_AWS_SECRET_ACCESS_KEY = data.aws_ssm_parameter.DYNAMODB_AWS_SECRET_ACCESS_KEY.value
+      SEARCH_TERMS               = var.youtube_search_terms
+      MAXIMUM_VIEW_COUNT         = var.youtube_max_view_count
+      YOUTUBE_API_TOKEN          = var.youtube_api_token
+      DYNAMODB_AWS_ACCESS_KEY    = var.aws_access_key
+      DYNAMODB_SECRET_ACCESS_KEY = var.aws_secret_key
     }
   }
 
