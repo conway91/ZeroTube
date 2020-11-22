@@ -27,14 +27,6 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v1
 
-      - name: Setup AWS Credentials
-        run: |
-          rm -rf .aws
-          mkdir -p .aws
-          echo "[default]" > .aws/credentials
-          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> .aws/credentials
-          echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .aws/credentials
-
       - run: terraform init
         working-directory: ./scripts/terraform/infrastructure
         env:
@@ -42,17 +34,14 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - id: plan
-        run: AWS_PROFILE=default terraform plan -no-color
+        run: terraform plan -no-color
         working-directory: ./scripts/terraform/infrastructure
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - run: echo ${{ steps.plan.outputs.stdout }}
+
       - run: echo ${{ steps.plan.outputs.stderr }}
+
       - run: echo ${{ steps.plan.outputs.exitcode }}
-
-      - name: Clean Credentials File
-        run: rm -rf .aws
-        if: ${{ always() }}
-
