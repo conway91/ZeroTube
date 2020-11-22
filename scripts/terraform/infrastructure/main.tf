@@ -135,12 +135,6 @@ resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_function_iam_role_policy.arn
 }
 
-variable "artifact_bucket_key" {
-  type        = string
-  description = "Bucket folder where the zipped artifact exists"
-  default     = "zerotube/PopulateYouTubeLinksFunction_latest.zip"
-}
-
 resource "aws_lambda_function" "populate_youtube_links_lambda_function" {
   function_name = "populate-youtube-links-lambda-function"
   s3_bucket     = "conway-build-artifacts"

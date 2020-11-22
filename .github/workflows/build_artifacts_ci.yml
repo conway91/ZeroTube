@@ -1,25 +1,38 @@
 name: Build-Artifacts
 
-# Run this workflow every time a new commit pushed to your repository
 on: workflow_dispatch
 
 jobs:
-  # Set the job key. The key is displayed as the job name
-  # when a job name is not provided
   build-artifacts:
-    # Name the Job
     name: Build Project PopulateYouTubeLinksFunction Artifact
-    # Set the type of machine to run on
     runs-on: ubuntu-latest
 
     steps:
-      # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Runs the Super-Linter action
       - name: Creating PopulateYouTubeLinksFunction Artifact and Pushing to S3
         run: ./scripts/CreateLambdaArtifacts.sh -l PopulateYouTubeLinksFunction -b conway-build-artifacts -v latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  build-terraform:
+    name: Build Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Creating PopulateYouTubeLinksFunction Artifact and Pushing to S3
+        run: hashicorp/setup-terraform@v1
+
+      - run: terraform init
+
+      - id: plan
+        run: terraform plan -no-color
+
+      - run: echo ${{ steps.plan.outputs.stdout }}
+      - run: echo ${{ steps.plan.outputs.stderr }}
+      - run: echo ${{ steps.plan.outputs.exitcode }}
