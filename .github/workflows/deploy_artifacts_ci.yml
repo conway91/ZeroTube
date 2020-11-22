@@ -1,6 +1,12 @@
 name: Deploy-Artifacts
 
-on: push
+on:
+  workflow_dispatch:
+    inputs:
+        version:
+          description: 'Version of project to deploy'
+          required: true
+          default: "latest"
 
 jobs:
   terraform-apply:
