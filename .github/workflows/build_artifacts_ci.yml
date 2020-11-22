@@ -25,12 +25,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Creating PopulateYouTubeLinksFunction Artifact and Pushing to S3
-        run: hashicorp/setup-terraform@v1
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v1
 
-      - run: terraform init
+      - name: Init Terraform
+        run: terraform init
 
-      - id: plan
+      - name: Plan Terraform
+        id: plan
         run: terraform plan -no-color
 
       - run: echo ${{ steps.plan.outputs.stdout }}
