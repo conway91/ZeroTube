@@ -21,23 +21,3 @@ resource "aws_ssm_parameter" "YOUTUBE_API_TOKEN" {
     project = "ZeroTube"
   }
 }
-
-resource "aws_ssm_parameter" "DYNAMODB_AWS_ACCESS_KEY" {
-  name  = "/zerotube/DYNAMODB_AWS_ACCESS_KEY"
-  type  = "SecureString"
-  value = var.dynamodb_aws_access_key
-
-  tags = {
-    project = "ZeroTube"
-  }
-}
-
-resource "aws_ssm_parameter" "DYNAMODB_AWS_SECRET_ACCESS_KEY" {
-  name  = "/zerotube/DYNAMODB_AWS_SECRET_ACCESS_KEY"
-  type  = "SecureString"
-  value = var.dynamodb_aws_secret_access_key
-
-  tags = {
-    project = "ZeroTube"
-  }
-}

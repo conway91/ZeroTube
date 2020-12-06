@@ -25,5 +25,5 @@ variable "youtube_search_terms" {
 variable "youtube_max_view_count" {
   type        = string
   description = "Maximum view count of videos to include in final result"
-  default     = "50"
+  default     = "10"
 }

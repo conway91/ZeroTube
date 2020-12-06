@@ -52,7 +52,7 @@ namespace ZeroTube.infrastructure.services.youtube
             listRequest.MaxResults = 50;
 
             var listResponse = await listRequest.ExecuteAsync();
-            var youtubeModels = listResponse.Items.Select(_ => new YouTubeLinkModel { Id = _.Id, ViewCount = (int)_.Statistics.ViewCount }).ToList();
+            var youtubeModels = listResponse.Items.Select(_ => new YouTubeLinkModel { Id = _.Id, SortKey = Guid.NewGuid().ToString(), ViewCount = (int)_.Statistics.ViewCount }).ToList();
 
             return youtubeModels;
         }
