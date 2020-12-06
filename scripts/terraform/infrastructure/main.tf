@@ -34,27 +34,6 @@ resource "aws_s3_bucket" "zerotube-site" {
   }
 }
 
-resource "aws_dynamodb_table" "basic-dynamodb-table" {
-  name         = "ZeroTubeLinks"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "Id"
-  range_key    = "SortKey"
-
-  attribute {
-    name = "Id"
-    type = "S"
-  }
-
-  attribute {
-    name = "SortKey"
-    type = "S"
-  }
-
-  tags = {
-    project = "ZeroTube"
-  }
-}
-
 resource "aws_iam_role" "lambda_function_iam_role" {
   name = "populate-youtube-links-lambda-function-iam-role"
 
@@ -87,32 +66,15 @@ resource "aws_iam_policy" "lambda_function_iam_role_policy" {
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "ListAndDescribe",
+            "Sid": "AccessS3Bucket",
             "Effect": "Allow",
             "Action": [
-                "dynamodb:List*",
-                "dynamodb:DescribeReservedCapacity*",
-                "dynamodb:DescribeLimits",
-                "dynamodb:DescribeTimeToLive"
+                "s3:*"
             ],
-            "Resource": "*"
-        },
-        {
-            "Sid": "SpecificTable",
-            "Effect": "Allow",
-            "Action": [
-                "dynamodb:BatchGet*",
-                "dynamodb:DescribeStream",
-                "dynamodb:DescribeTable",
-                "dynamodb:Get*",
-                "dynamodb:Query",
-                "dynamodb:Scan",
-                "dynamodb:BatchWrite*",
-                "dynamodb:Delete*",
-                "dynamodb:Update*",
-                "dynamodb:PutItem"
-            ],
-            "Resource": "arn:aws:dynamodb:*:*:table/ZeroTubeLinks"
+            "Resource": [
+              "arn:aws:s3:::www.${var.domain_name}/*",
+              "arn:aws:s3:::www.${var.domain_name}"
+            ]
         },
         {
             "Sid": "AllowLogging",
@@ -147,23 +109,10 @@ resource "aws_lambda_function" "populate_youtube_links_lambda_function" {
     variables = {
       SEARCH_TERMS       = var.youtube_search_terms
       MAXIMUM_VIEW_COUNT = var.youtube_max_view_count
+      SITE_BUCKET_NAME = "www.${var.domain_name}"
       YOUTUBE_API_TOKEN  = data.aws_ssm_parameter.YOUTUBE_API_TOKEN.value
     }
   }
-
-  tags = {
-    project = "ZeroTube"
-  }
-}
-
-resource "aws_lambda_function" "get_youtube_links_lambda_function" {
-  function_name = "zerotube-get-youtube-links-lambda-function"
-  s3_bucket     = "conway-build-artifacts"
-  s3_key        = "zerotube/GetYouTubeLinksFunction_${var.populate_youtube_links_version}.zip"
-  role          = aws_iam_role.lambda_function_iam_role.arn
-  handler       = "ZeroTube.Lambda.GetYouTubeLinksFunction::ZeroTube.Lambda.GetYouTubeLinksFunction.Function::FunctionHandler"
-  runtime       = "dotnetcore3.1"
-  timeout       = 120
 
   tags = {
     project = "ZeroTube"
