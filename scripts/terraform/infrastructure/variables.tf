@@ -13,7 +13,6 @@ variable "domain_name" {
 variable "populate_youtube_links_version" {
   type        = string
   description = "Lambda version to deploy for the PopulateYouTubeLinksFunction"
-  default     = "latest"
 }
 
 variable "youtube_search_terms" {

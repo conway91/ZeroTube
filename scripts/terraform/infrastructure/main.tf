@@ -23,7 +23,8 @@ resource "aws_s3_bucket" "zerotube-site-logs" {
 
 resource "aws_s3_bucket" "zerotube-site" {
   bucket = "www.${var.domain_name}"
-
+  acl = "public-read"
+  
   logging {
     target_bucket = aws_s3_bucket.zerotube-site-logs.bucket
     target_prefix = "www.${var.domain_name}/"
@@ -66,17 +67,6 @@ resource "aws_iam_policy" "lambda_function_iam_role_policy" {
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "AccessS3Bucket",
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-              "arn:aws:s3:::www.${var.domain_name}/*",
-              "arn:aws:s3:::www.${var.domain_name}"
-            ]
-        },
-        {
             "Sid": "AllowLogging",
             "Action": [
                 "logs:CreateLogGroup",
@@ -96,20 +86,37 @@ resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_function_iam_role_policy.arn
 }
 
-resource "aws_lambda_function" "populate_youtube_links_lambda_function" {
-  function_name = "zerotube-populate-youtube-links-lambda-function"
+resource "aws_rds_cluster" "aurora_cluster" {
+  cluster_identifier      = "zerotube-db"
+  engine_version          = "5.7.mysql_aurora.2.03.2"
+  availability_zones      = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  database_name           = "zerotube"
+  master_username         = "foo"
+  master_password         = "bar"
+  engine_mode = "serverless"
+
+  scaling_configuration {
+    auto_pause               = true
+    max_capacity             = 2
+    min_capacity             = 2
+    seconds_until_auto_pause = 300
+    timeout_action           = "ForceApplyCapacityChange"
+  }
+}
+
+resource "aws_lambda_function" "create_youtube_links_lambda_function" {
+  function_name = "zerotube-create-youtube-links-lambda-function_${var.populate_youtube_links_version}"
   s3_bucket     = "conway-build-artifacts"
-  s3_key        = "zerotube/PopulateYouTubeLinksFunction_${var.populate_youtube_links_version}.zip"
+  s3_key        = "zerotube/CreateYouTubeLinksFunction_${var.populate_youtube_links_version}.zip"
   role          = aws_iam_role.lambda_function_iam_role.arn
-  handler       = "ZeroTube.Lambda.PopulateYouTubeLinksFunction::ZeroTube.Lambda.PopulateYouTubeLinksFunction.Function::FunctionHandler"
-  runtime       = "dotnetcore3.1"
+  handler       = "artifacts/CreateYouTubeLinksFunction/main"
+  runtime       = "go1.x"
   timeout       = 120
 
   environment {
     variables = {
       SEARCH_TERMS       = var.youtube_search_terms
       MAXIMUM_VIEW_COUNT = var.youtube_max_view_count
-      SITE_BUCKET_NAME = "www.${var.domain_name}"
       YOUTUBE_API_TOKEN  = data.aws_ssm_parameter.YOUTUBE_API_TOKEN.value
     }
   }

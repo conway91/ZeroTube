@@ -15,11 +15,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="services\" />
-    <Folder Include="services\storage\" />
-    <Folder Include="services\storage\DynamoDb\" />
     <Folder Include="services\youtube\" />
     <Folder Include="services\models\" />
     <Folder Include="helpers\" />
-    <Folder Include="test\" />
   </ItemGroup>
 </Project>
