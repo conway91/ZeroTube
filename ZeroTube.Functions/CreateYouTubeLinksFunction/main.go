@@ -4,6 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/google/uuid"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 	"log"
@@ -14,6 +19,7 @@ import (
 )
 
 type YouTubeModel struct {
+	Id string
 	VideoId string
 	ViewCount string
 }
@@ -34,6 +40,8 @@ func HandleRequest(ctx context.Context) {
 		for _, youtubeModel := range youtubeModels {
 			log.Printf("Created model with id '%v' with views of '%v'", youtubeModel.VideoId, youtubeModel.ViewCount)
 		}
+
+		pushVideoIdsToDynamoDb(youtubeModels)
 	}
 }
 
@@ -91,11 +99,29 @@ func filterYouTubeVideoIdsByViews(youTubeService *youtube.Service, videoIds []st
 
 	for _, item := range serviceVideoCallResponse.Items {
 		if item.Statistics.ViewCount <= maxViewCount {
-			youtubeModels = append(youtubeModels, YouTubeModel{ VideoId: item.Id, ViewCount: strconv.Itoa(int(item.Statistics.ViewCount))})
+			id := uuid.New().String()
+			youtubeModels = append(youtubeModels, YouTubeModel{ Id: id, VideoId: item.Id, ViewCount: strconv.Itoa(int(item.Statistics.ViewCount))})
 		}
 	}
 
 	return youtubeModels
+}
+
+func pushVideoIdsToDynamoDb(youTubeModels []YouTubeModel) {
+	tableName := os.Getenv("DYNAMO_TABLE_NAME")
+	log.Printf("Pushing ids to dynamo table : '%s'", tableName)
+	dynamoClient := dynamodb.New(session.Must(session.NewSession()))
+
+	for _, youTubeModel := range youTubeModels {
+		attributeValue, err := dynamodbattribute.MarshalMap(youTubeModel)
+		HandleError(err)
+
+		_, err = dynamoClient.PutItem(&dynamodb.PutItemInput{
+			Item:      attributeValue,
+			TableName: aws.String(tableName),
+		})
+		HandleError(err)
+	}
 }
 
 func HandleError(err error) {

@@ -24,7 +24,7 @@ resource "aws_s3_bucket" "zerotube-site-logs" {
 resource "aws_s3_bucket" "zerotube-site" {
   bucket = "www.${var.domain_name}"
   acl = "public-read"
-  
+
   logging {
     target_bucket = aws_s3_bucket.zerotube-site-logs.bucket
     target_prefix = "www.${var.domain_name}/"
@@ -32,6 +32,22 @@ resource "aws_s3_bucket" "zerotube-site" {
 
   website {
     index_document = "index.html"
+  }
+}
+
+resource "aws_dynamodb_table" "zerotube_db" {
+  name           = "ZeroTube"
+  read_capacity  = 20
+  write_capacity = 20
+  hash_key       = "Id"
+
+  attribute {
+    name = "Id"
+    type = "S"
+  }
+
+  tags = {
+    project = "ZeroTube"
   }
 }
 
@@ -75,6 +91,14 @@ resource "aws_iam_policy" "lambda_function_iam_role_policy" {
             ],
             "Effect": "Allow",
             "Resource": "arn:aws:logs:*:*:*"
+        },
+        {
+            "Sid": "AllowDynamo",
+            "Action": [
+                "dynamodb:PutItem"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
         }
     ]
 }
@@ -84,24 +108,6 @@ EOF
 resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment" {
   role       = aws_iam_role.lambda_function_iam_role.name
   policy_arn = aws_iam_policy.lambda_function_iam_role_policy.arn
-}
-
-resource "aws_rds_cluster" "aurora_cluster" {
-  cluster_identifier      = "zerotube-db"
-  engine_version          = "5.7.mysql_aurora.2.03.2"
-  availability_zones      = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-  database_name           = "zerotube"
-  master_username         = "foo"
-  master_password         = "bar"
-  engine_mode = "serverless"
-
-  scaling_configuration {
-    auto_pause               = true
-    max_capacity             = 2
-    min_capacity             = 2
-    seconds_until_auto_pause = 300
-    timeout_action           = "ForceApplyCapacityChange"
-  }
 }
 
 resource "aws_lambda_function" "create_youtube_links_lambda_function" {
@@ -118,6 +124,7 @@ resource "aws_lambda_function" "create_youtube_links_lambda_function" {
       SEARCH_TERMS       = var.youtube_search_terms
       MAXIMUM_VIEW_COUNT = var.youtube_max_view_count
       YOUTUBE_API_TOKEN  = data.aws_ssm_parameter.YOUTUBE_API_TOKEN.value
+      DYNAMO_TABLE_NAME  = aws_dynamodb_table.zerotube_db.name
     }
   }
 
