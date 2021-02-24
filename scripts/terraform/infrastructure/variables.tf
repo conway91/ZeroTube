@@ -10,10 +10,9 @@ variable "domain_name" {
   default     = "zerotube.org"
 }
 
-variable "populate_youtube_links_version" {
+variable "lambda_version" {
   type        = string
-  description = "Lambda version to deploy for the PopulateYouTubeLinksFunction"
-  default     = "latest"
+  description = "Lambda version to deploy"
 }
 
 variable "youtube_search_terms" {
