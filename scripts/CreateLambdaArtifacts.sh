@@ -22,7 +22,7 @@ echo "Building/zipping Lambda artifact GetRandomYouTubeLinkFunction"
 GOOS=linux GOARCH=amd64 go build -o ./artifacts/GetRandomYouTubeLinkFunction/main ./ZeroTube.Functions/GetRandomYouTubeLinkFunction
 zip ./artifacts/GetRandomYouTubeLinkFunction.zip ./artifacts/GetRandomYouTubeLinkFunction/main
 
-echo "Pushing artifacts to S3 with on '${VERSION}'"
+echo "Pushing artifacts to S3 with version '${VERSION}'"
 aws s3 cp ./artifacts/CreateYouTubeLinksFunction.zip s3://conway-build-artifacts/zerotube/CreateYouTubeLinksFunction_${VERSION}.zip
 aws s3 cp ./artifacts/GetRandomYouTubeLinkFunction.zip s3://conway-build-artifacts/zerotube/GetRandomYouTubeLinkFunction_${VERSION}.zip
 

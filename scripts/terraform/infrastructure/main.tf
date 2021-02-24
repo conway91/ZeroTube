@@ -133,6 +133,11 @@ resource "aws_lambda_function" "create_youtube_links_lambda_function" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "create_youtube_links_lambda_function_log_group" {
+  name = "/aws/lambda/${aws_lambda_function.create_youtube_links_lambda_function.function_name}"
+  retention_in_days = 7
+}
+
 resource "aws_lambda_function" "get_random_youtube_link_lambda_function" {
   function_name = "zerotube-get-random-youtube-link-lambda-function_${var.lambda_version}"
   s3_bucket     = "conway-build-artifacts"
@@ -151,6 +156,61 @@ resource "aws_lambda_function" "get_random_youtube_link_lambda_function" {
   tags = {
     project = "ZeroTube"
   }
+}
+
+resource "aws_cloudwatch_log_group" "get_random_youtube_link_lambda_function_log_group" {
+  name = "/aws/lambda/${aws_lambda_function.get_random_youtube_link_lambda_function.function_name}"
+  retention_in_days = 7
+}
+
+resource "aws_api_gateway_account" "agw_account" {
+  cloudwatch_role_arn = aws_iam_role.agw_global_cloudwatch_role.arn
+}
+
+resource "aws_iam_role" "agw_global_cloudwatch_role" {
+  name = "api-gateway-cloudwatch-global-iam-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "agw_global_cloudwatch_role_policy" {
+  name = "api-gateway-cloudwatch-global-iam-role-policy"
+  role = aws_iam_role.agw_global_cloudwatch_role.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
 }
 
 resource "aws_api_gateway_rest_api" "zerotube_agw" {
@@ -180,7 +240,7 @@ resource "aws_api_gateway_integration" "random_agw_get_method_lambda_integration
   resource_id = aws_api_gateway_method.random_agw_get_method.resource_id
   http_method = aws_api_gateway_method.random_agw_get_method.http_method
 
-  integration_http_method = "GET"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.get_random_youtube_link_lambda_function.invoke_arn
 }
@@ -202,9 +262,27 @@ resource "aws_api_gateway_deployment" "agw_deployment" {
 }
 
 resource "aws_api_gateway_stage" "agw_stage" {
+  depends_on = [aws_cloudwatch_log_group.agw_log_group]
+
   deployment_id = aws_api_gateway_deployment.agw_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.zerotube_agw.id
-  stage_name    = "prod"
+  stage_name    = "zerotube"
+}
+
+resource "aws_api_gateway_method_settings" "all" {
+  rest_api_id = aws_api_gateway_rest_api.zerotube_agw.id
+  stage_name  = aws_api_gateway_stage.agw_stage.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled = true
+    logging_level   = "INFO"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "agw_log_group" {
+  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.zerotube_agw.id}/zerotube"
+  retention_in_days = 7
 }
 
 resource "aws_lambda_permission" "agw_lambda_permission" {
