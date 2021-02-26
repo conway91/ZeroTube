@@ -7,12 +7,10 @@
 .env.production.local
 .DS_Store*
 Icon?
-
-# Remainings from resolving conflicts in Source Control
+.idea
 *.orig
-
-
 artifacts/*
+frontend-app/build
 
 # terraform directories
 **/.terraform/*
