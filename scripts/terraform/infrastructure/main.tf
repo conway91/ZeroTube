@@ -95,7 +95,8 @@ resource "aws_iam_policy" "lambda_function_iam_role_policy" {
         {
             "Sid": "AllowDynamo",
             "Action": [
-                "dynamodb:PutItem"
+                "dynamodb:PutItem",
+                "dynamodb:Scan"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -253,6 +254,7 @@ resource "aws_api_gateway_deployment" "agw_deployment" {
       aws_api_gateway_resource.random_agw_resource.id,
       aws_api_gateway_method.random_agw_get_method.id,
       aws_api_gateway_integration.random_agw_get_method_lambda_integration.id,
+      aws_lambda_function.get_random_youtube_link_lambda_function.arn
     ]))
   }
 
