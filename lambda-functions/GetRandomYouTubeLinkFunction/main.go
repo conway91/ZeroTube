@@ -40,6 +40,7 @@ func HandleRequest(ctx context.Context) (events.APIGatewayProxyResponse, error) 
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
 		Body:       string(js),
+		Headers: getResponseHeaders(),
 	}, nil
 }
 
@@ -75,5 +76,15 @@ func serverError(err error) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusInternalServerError,
 		Body:       http.StatusText(http.StatusInternalServerError),
+		Headers: getResponseHeaders(),
 	}, nil
+}
+
+func getResponseHeaders() map[string]string {
+	headers := make(map[string]string)
+	headers["Access-Control-Allow-Origin"] = "*"
+	headers["Access-Control-Allow-Headers"] = "*"
+	headers["Access-Control-Allow-Methods"] = "OPTIONS,GET"
+
+	return headers
 }

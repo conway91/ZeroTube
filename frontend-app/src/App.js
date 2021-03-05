@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
+import YouTubeVideo from "./components/YouTubeVideo";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            videoInfo: ""
+        };
+    }
+
+    componentDidMount() {
+        fetch('https://9jt0cb12a9.execute-api.eu-west-1.amazonaws.com/zerotube/random')
+            .then(res => res.json())
+            .then((data) => {
+                this.setState({ videoInfo: data })
+            })
+            .catch(console.log)
+
+        //// Uncomment for testing without hitting the API
+        // this.setState({ videoInfo: {
+        //         VideoId: "BY8KsQFmyUM",
+        //         ViewCount: "99"
+        // }})
+    }
+
+    render() {
+        return (
+            <YouTubeVideo videoInfo={this.state.videoInfo} />
+        );
+    }
 }
 
 export default App;
