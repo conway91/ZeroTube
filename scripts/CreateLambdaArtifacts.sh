@@ -15,11 +15,11 @@ fi
 
 echo "Building/zipping Lambda artifact CreateYouTubeLinksFunction"
 go get golang.org/x/sys/unix
-GOOS=linux GOARCH=amd64 go build -o ./artifacts/CreateYouTubeLinksFunction/main ./ZeroTube.Functions/CreateYouTubeLinksFunction
+GOOS=linux GOARCH=amd64 go build -o ./artifacts/CreateYouTubeLinksFunction/main ./lambda-functions/CreateYouTubeLinksFunction
 zip ./artifacts/CreateYouTubeLinksFunction.zip ./artifacts/CreateYouTubeLinksFunction/main
 
 echo "Building/zipping Lambda artifact GetRandomYouTubeLinkFunction"
-GOOS=linux GOARCH=amd64 go build -o ./artifacts/GetRandomYouTubeLinkFunction/main ./ZeroTube.Functions/GetRandomYouTubeLinkFunction
+GOOS=linux GOARCH=amd64 go build -o ./artifacts/GetRandomYouTubeLinkFunction/main ./lambda-functions/GetRandomYouTubeLinkFunction
 zip ./artifacts/GetRandomYouTubeLinkFunction.zip ./artifacts/GetRandomYouTubeLinkFunction/main
 
 echo "Pushing artifacts to S3 with version '${VERSION}'"
