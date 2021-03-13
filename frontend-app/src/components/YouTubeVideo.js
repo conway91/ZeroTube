@@ -10,18 +10,18 @@ class YouTubeVideo extends Component {
     }
 
     componentDidMount() {
-        // fetch('https://9jt0cb12a9.execute-api.eu-west-1.amazonaws.com/zerotube/random')
-        //     .then(res => res.json())
-        //     .then((data) => {
-        //         this.setState({ videoInfo: data })
-        //     })
-        //     .catch(console.log)
+        fetch('https://9jt0cb12a9.execute-api.eu-west-1.amazonaws.com/zerotube/random')
+            .then(res => res.json())
+            .then((data) => {
+                this.setState({ videoInfo: data })
+            })
+            .catch(console.log)
 
-        // Uncomment for testing without hitting the API
-        this.setState({ videoInfo: {
-                VideoId: "BY8KsQFmyUM",
-                ViewCount: "99"
-        }})
+        // // Uncomment for testing without hitting the API
+        // this.setState({ videoInfo: {
+        //         VideoId: "BY8KsQFmyUM",
+        //         ViewCount: "99"
+        // }})
     }
 
     render() {
