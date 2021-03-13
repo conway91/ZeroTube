@@ -164,6 +164,26 @@ resource "aws_cloudwatch_log_group" "get_random_youtube_link_lambda_function_log
   retention_in_days = 7
 }
 
+resource "aws_cloudwatch_event_rule" "zerotube_create_youtube_links_lambda_function_event_rule" {
+  name                = "zerotube-create-youtube-links-lambda-function-event-rule"
+  description         = "Triggers the lambda every 3 hours"
+  schedule_expression = "rate(3 hours)"
+}
+
+resource "aws_cloudwatch_event_target" "zerotube_create_youtube_links_lambda_function_event_target" {
+  rule      = aws_cloudwatch_event_rule.zerotube_create_youtube_links_lambda_function_event_rule.name
+  target_id = "lambda"
+  arn       = aws_lambda_function.create_youtube_links_lambda_function.arn
+}
+
+resource "aws_lambda_permission" "zerotube_create_youtube_links_lambda_function_permission" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.create_youtube_links_lambda_function.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.zerotube_create_youtube_links_lambda_function_event_rule.arn
+}
+
 resource "aws_api_gateway_account" "agw_account" {
   cloudwatch_role_arn = aws_iam_role.agw_global_cloudwatch_role.arn
 }
