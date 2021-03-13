@@ -1,4 +1,4 @@
-.youtube-video-container {
-    margin: auto;
-    width: 50%;
+.youtube-container {
+    max-width: 900px;
+    margin: 0 auto;
 }

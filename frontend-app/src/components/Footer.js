@@ -4,7 +4,7 @@ import './Footer.css'
 class Footer extends Component {
     render() {
         return (
-            <div className="footer-container">
+            <div className="footer-container container">
                 <span>
                     <a> Home</a> |
                     <a> About</a> |

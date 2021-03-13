@@ -17,8 +17,8 @@ import (
 )
 
 type YouTubeModel struct {
-	Id string
-	VideoId string
+	Id        string
+	VideoId   string
 	ViewCount string
 }
 
@@ -40,7 +40,7 @@ func HandleRequest(ctx context.Context) (events.APIGatewayProxyResponse, error) 
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
 		Body:       string(js),
-		Headers: getResponseHeaders(),
+		Headers:    getResponseHeaders(),
 	}, nil
 }
 
@@ -49,7 +49,7 @@ func getDynamoEntry() (YouTubeModel, error) {
 	lastKeyEvaluated := uuid.New().String()
 
 	result, err := dynamoClient.Scan(&dynamodb.ScanInput{
-		TableName:                 aws.String(os.Getenv("DYNAMO_TABLE_NAME")),
+		TableName: aws.String(os.Getenv("DYNAMO_TABLE_NAME")),
 		ExclusiveStartKey: map[string]*dynamodb.AttributeValue{
 			"Id": {
 				S: aws.String(lastKeyEvaluated),
@@ -76,7 +76,7 @@ func serverError(err error) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusInternalServerError,
 		Body:       http.StatusText(http.StatusInternalServerError),
-		Headers: getResponseHeaders(),
+		Headers:    getResponseHeaders(),
 	}, nil
 }
 

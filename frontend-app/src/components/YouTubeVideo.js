@@ -26,10 +26,13 @@ class YouTubeVideo extends Component {
 
     render() {
         return (
-            <div className="youtube-video-container">
-                <iframe id="youtubeVideo" title="youtubeVideo" width="640" height="360"
-                        src={"https://www.youtube.com/embed/" + this.state.videoInfo['VideoId'] + "?autoplay=1"}
-                        frameBorder="0"/>
+
+            <div className="container youtube-container">
+                <div className="embed-responsive embed-responsive-16by9">
+                    <iframe className="embed-responsive-item" id="youtubeVideo" title="youtubeVideo"
+                            src={"https://www.youtube.com/embed/" + this.state.videoInfo['VideoId'] + "?autoplay=1"}
+                    />
+                </div>
                 <p>Video views : { this.state.videoInfo['ViewCount'] }</p>
             </div>
         );
