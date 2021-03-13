@@ -22,9 +22,14 @@ echo "Building/zipping Lambda artifact GetRandomYouTubeLinkFunction"
 GOOS=linux GOARCH=amd64 go build -o ./artifacts/GetRandomYouTubeLinkFunction/main ./lambda-functions/GetRandomYouTubeLinkFunction
 zip ./artifacts/GetRandomYouTubeLinkFunction.zip ./artifacts/GetRandomYouTubeLinkFunction/main
 
+echo "Building/zipping Lambda artifact CleanupYouTubeLinksFunction"
+GOOS=linux GOARCH=amd64 go build -o ./artifacts/CleanupYouTubeLinksFunction/main ./lambda-functions/CleanupYouTubeLinksFunction
+zip ./artifacts/CleanupYouTubeLinksFunction.zip ./artifacts/CleanupYouTubeLinksFunction/main
+
 echo "Pushing artifacts to S3 with version '${VERSION}'"
 aws s3 cp ./artifacts/CreateYouTubeLinksFunction.zip s3://conway-build-artifacts/zerotube/CreateYouTubeLinksFunction_${VERSION}.zip
 aws s3 cp ./artifacts/GetRandomYouTubeLinkFunction.zip s3://conway-build-artifacts/zerotube/GetRandomYouTubeLinkFunction_${VERSION}.zip
+aws s3 cp ./artifacts/CleanupYouTubeLinksFunction.zip s3://conway-build-artifacts/zerotube/CleanupYouTubeLinksFunction_${VERSION}.zip
 
 echo "Artifact creation complete. Removing locally generated files"
 rm -frv ./artifacts/*
