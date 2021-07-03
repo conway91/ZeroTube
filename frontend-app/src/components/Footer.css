@@ -2,3 +2,31 @@
     text-align: center;
     font-size: 14px;
 }
+
+.divider {
+    margin: 5px;
+}
+
+a:link {
+    color: #E0E0E0;
+}
+  
+a:visited {
+    color: #E0E0E0;
+}
+
+a:hover {
+    color: #E0E0E0;
+}
+a:active {
+    color: #E0E0E0;
+}
+
+.change-state {
+    color: #E0E0E0;
+    cursor:pointer;
+}
+
+.change-state:hover {
+    text-decoration:underline;
+}
