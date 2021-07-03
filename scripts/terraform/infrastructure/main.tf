@@ -33,6 +33,40 @@ resource "aws_s3_bucket" "zerotube-site" {
   website {
     index_document = "index.html"
   }
+
+  tags = {
+    project = "ZeroTube"
+  }
+}
+
+resource "aws_s3_bucket_policy" "zerotube-site-policy" {
+  bucket = aws_s3_bucket.zerotube-site.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "PublicReadGetObject",
+        Effect: "Allow",
+        Principal: "*",
+        Action: "s3:GetObject",
+        Resource = "arn:aws:s3:::www.${var.domain_name}/*"
+      },
+    ]
+  })
+}
+
+resource "aws_s3_bucket" "zerotube-site-subdomain" {
+  bucket = var.domain_name
+  acl = "public-read"
+
+  website {
+    redirect_all_requests_to = "www.${var.domain_name}"
+  }
+
+  tags = {
+    project = "ZeroTube"
+  }
 }
 
 resource "aws_dynamodb_table" "zerotube_db" {
