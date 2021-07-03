@@ -17,7 +17,7 @@ class YouTubeVideo extends Component {
             })
             .catch(console.log)
 
-        // // Uncomment for testing without hitting the API
+        // Uncomment for testing without hitting the API
         // this.setState({ videoInfo: {
         //         VideoId: "BY8KsQFmyUM",
         //         ViewCount: "99"
@@ -26,11 +26,10 @@ class YouTubeVideo extends Component {
 
     render() {
         return (
-
             <div className="container youtube-container">
                 <div className="embed-responsive embed-responsive-16by9">
-                    <iframe className="embed-responsive-item" id="youtubeVideo" title="youtubeVideo"
-                            src={"https://www.youtube.com/embed/" + this.state.videoInfo['VideoId'] + "?autoplay=1"}
+                    <iframe className="embed-responsive-item" id="youtubeVideo" title="youtubeVideo" allow='autoplay' allowfullscreen="0"
+                            src={"https://www.youtube.com/embed/" + this.state.videoInfo['VideoId'] + "?autoplay=1?controls=0"}
                     />
                 </div>
                 <p>Video views : { this.state.videoInfo['ViewCount'] }</p>

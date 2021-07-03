@@ -3,12 +3,15 @@ import './Footer.css'
 
 class Footer extends Component {
     render() {
+        const { changeState } = this.props;
         return (
             <div className="footer-container container">
                 <span>
-                    <a> Home</a> |
-                    <a> About</a> |
-                    <a> GitHub</a>
+                    <a href="">Home</a>
+                    <span className="divider">|</span>
+                    <span className="change-state" onClick={()=> changeState("about")}>About</span>
+                    <span className="divider">|</span>
+                    <a href="https://github.com/conway91/ZeroTube" target="_blank">GitHub</a>
                 </span>
                 <br />
                 <p>2021</p>

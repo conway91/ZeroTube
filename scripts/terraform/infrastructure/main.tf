@@ -114,7 +114,7 @@ resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment" {
 resource "aws_lambda_function" "create_youtube_links_lambda_function" {
   function_name = "zerotube-create-youtube-links-lambda-function_${var.lambda_version}"
   s3_bucket     = "conway-build-artifacts"
-  s3_key        = "zerotube/CreateYouTubeLinksFunction_${var.lambda_version}.zip"
+  s3_key        = "zerotube/CreateYouTubeLinksFunction/CreateYouTubeLinksFunction_${var.lambda_version}.zip"
   role          = aws_iam_role.lambda_function_iam_role.arn
   handler       = "artifacts/CreateYouTubeLinksFunction/main"
   runtime       = "go1.x"
@@ -142,7 +142,7 @@ resource "aws_cloudwatch_log_group" "create_youtube_links_lambda_function_log_gr
 resource "aws_lambda_function" "get_random_youtube_link_lambda_function" {
   function_name = "zerotube-get-random-youtube-link-lambda-function_${var.lambda_version}"
   s3_bucket     = "conway-build-artifacts"
-  s3_key        = "zerotube/GetRandomYouTubeLinkFunction_${var.lambda_version}.zip"
+  s3_key        = "zerotube/GetRandomYouTubeLinkFunction/GetRandomYouTubeLinkFunction_${var.lambda_version}.zip"
   role          = aws_iam_role.lambda_function_iam_role.arn
   handler       = "artifacts/GetRandomYouTubeLinkFunction/main"
   runtime       = "go1.x"
@@ -161,6 +161,33 @@ resource "aws_lambda_function" "get_random_youtube_link_lambda_function" {
 
 resource "aws_cloudwatch_log_group" "get_random_youtube_link_lambda_function_log_group" {
   name = "/aws/lambda/${aws_lambda_function.get_random_youtube_link_lambda_function.function_name}"
+  retention_in_days = 7
+}
+
+resource "aws_lambda_function" "cleanup_youtube_link_lambda_function" {
+  function_name = "zerotube-cleanup-youtube-links-lambda-function_${var.lambda_version}"
+  s3_bucket     = "conway-build-artifacts"
+  s3_key        = "zerotube/CleanupYouTubeLinksFunction/CleanupYouTubeLinksFunction_${var.lambda_version}.zip"
+  role          = aws_iam_role.lambda_function_iam_role.arn
+  handler       = "artifacts/CleanupYouTubeLinksFunction/main"
+  runtime       = "go1.x"
+  timeout       = 120
+
+  environment {
+    variables = {
+      DYNAMO_TABLE_NAME  = aws_dynamodb_table.zerotube_db.name
+      MAXIMUM_VIEW_COUNT = var.youtube_max_view_count
+      YOUTUBE_API_TOKEN  = data.aws_ssm_parameter.YOUTUBE_API_TOKEN.value
+    }
+  }
+
+  tags = {
+    project = "ZeroTube"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "cleanup_youtube_links_lambda_function_log_group" {
+  name = "/aws/lambda/${aws_lambda_function.cleanup_youtube_link_lambda_function.function_name}"
   retention_in_days = 7
 }
 

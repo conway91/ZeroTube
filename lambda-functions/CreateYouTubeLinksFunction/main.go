@@ -31,17 +31,27 @@ func main() {
 func HandleRequest(ctx context.Context) {
 	youTubeService := getYouTubeService()
 	queryTerms := strings.Split(os.Getenv("SEARCH_TERMS"), ",")
+	dynamoClient := dynamodb.New(session.Must(session.NewSession()))
+	existingEntries := getAllDynamoEntriesByVideoId(dynamoClient)
 
 	for _, queryTerm := range queryTerms {
+		allVideoIds := getYoutubeVideoIds(youTubeService, queryTerm)
+		var newVideoIds []string
 
-		videoIds := getYoutubeVideoIds(youTubeService, queryTerm)
-		youtubeModels := filterYouTubeVideoIdsByViews(youTubeService, videoIds)
+		log.Print("Filtering out existing video ids already in dynamodb")
+		for _, videoId := range allVideoIds {
+			if _, exists := existingEntries[videoId]; !exists {
+				newVideoIds = append(newVideoIds, videoId)
+			}
+		}
+
+		youtubeModels := filterYouTubeVideoIdsByViews(youTubeService, newVideoIds)
 
 		for _, youtubeModel := range youtubeModels {
 			log.Printf("Created model with id '%v' with views of '%v'", youtubeModel.VideoId, youtubeModel.ViewCount)
 		}
 
-		pushVideoIdsToDynamoDb(youtubeModels)
+		pushVideoIdsToDynamoDb(dynamoClient, youtubeModels)
 	}
 }
 
@@ -107,10 +117,31 @@ func filterYouTubeVideoIdsByViews(youTubeService *youtube.Service, videoIds []st
 	return youtubeModels
 }
 
-func pushVideoIdsToDynamoDb(youTubeModels []YouTubeModel) {
+func getAllDynamoEntriesByVideoId(dynamoClient *dynamodb.DynamoDB) map[string]YouTubeModel {
+	tableName := os.Getenv("DYNAMO_TABLE_NAME")
+	log.Printf("Getting all entries by Id from dynamo table : '%s'", tableName)
+
+	result, err := dynamoClient.Scan(&dynamodb.ScanInput{
+		TableName:                 aws.String(tableName),
+	})
+	HandleError(err)
+
+	youtubeModels := make(map[string]YouTubeModel)
+	for _, item := range result.Items {
+		youtubeModel := YouTubeModel{}
+
+		err = dynamodbattribute.UnmarshalMap(item, &youtubeModel)
+		HandleError(err)
+		youtubeModels[youtubeModel.VideoId] = youtubeModel
+	}
+
+	log.Printf("Retrieved '%b' models", len(youtubeModels))
+	return youtubeModels
+}
+
+func pushVideoIdsToDynamoDb(dynamoClient *dynamodb.DynamoDB, youTubeModels []YouTubeModel) {
 	tableName := os.Getenv("DYNAMO_TABLE_NAME")
 	log.Printf("Pushing ids to dynamo table : '%s'", tableName)
-	dynamoClient := dynamodb.New(session.Must(session.NewSession()))
 
 	for _, youTubeModel := range youTubeModels {
 		attributeValue, err := dynamodbattribute.MarshalMap(youTubeModel)
