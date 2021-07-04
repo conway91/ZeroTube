@@ -5,7 +5,7 @@ class Header extends Component {
     render() {
         return (
             <div className="header-container container-fluid">
-                <h1 className="title">ZeroTube</h1>
+                <h1 className="title"><a href="/">ZeroTube</a></h1>
             </div>
         );
     }
