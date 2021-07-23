@@ -1,3 +1,5 @@
+// Route 53 and CloudFront resources are made and managed manually (not via a Terraform script)
+
 terraform {
   backend "s3" {
     bucket  = "conway-terraform-states"
@@ -23,7 +25,7 @@ resource "aws_s3_bucket" "zerotube-site-logs" {
 
 resource "aws_s3_bucket" "zerotube-site" {
   bucket = "www.${var.domain_name}"
-  acl = "public-read"
+  acl    = "public-read"
 
   logging {
     target_bucket = aws_s3_bucket.zerotube-site-logs.bucket
@@ -47,9 +49,9 @@ resource "aws_s3_bucket_policy" "zerotube-site-policy" {
     Statement = [
       {
         Sid = "PublicReadGetObject",
-        Effect: "Allow",
-        Principal: "*",
-        Action: "s3:GetObject",
+        Effect : "Allow",
+        Principal : "*",
+        Action : "s3:GetObject",
         Resource = "arn:aws:s3:::www.${var.domain_name}/*"
       },
     ]
@@ -58,7 +60,7 @@ resource "aws_s3_bucket_policy" "zerotube-site-policy" {
 
 resource "aws_s3_bucket" "zerotube-site-subdomain" {
   bucket = var.domain_name
-  acl = "public-read"
+  acl    = "public-read"
 
   website {
     redirect_all_requests_to = "www.${var.domain_name}"
@@ -169,7 +171,7 @@ resource "aws_lambda_function" "create_youtube_links_lambda_function" {
 }
 
 resource "aws_cloudwatch_log_group" "create_youtube_links_lambda_function_log_group" {
-  name = "/aws/lambda/${aws_lambda_function.create_youtube_links_lambda_function.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.create_youtube_links_lambda_function.function_name}"
   retention_in_days = 7
 }
 
@@ -184,7 +186,7 @@ resource "aws_lambda_function" "get_random_youtube_link_lambda_function" {
 
   environment {
     variables = {
-      DYNAMO_TABLE_NAME  = aws_dynamodb_table.zerotube_db.name
+      DYNAMO_TABLE_NAME = aws_dynamodb_table.zerotube_db.name
     }
   }
 
@@ -194,7 +196,7 @@ resource "aws_lambda_function" "get_random_youtube_link_lambda_function" {
 }
 
 resource "aws_cloudwatch_log_group" "get_random_youtube_link_lambda_function_log_group" {
-  name = "/aws/lambda/${aws_lambda_function.get_random_youtube_link_lambda_function.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.get_random_youtube_link_lambda_function.function_name}"
   retention_in_days = 7
 }
 
@@ -221,7 +223,7 @@ resource "aws_lambda_function" "cleanup_youtube_link_lambda_function" {
 }
 
 resource "aws_cloudwatch_log_group" "cleanup_youtube_links_lambda_function_log_group" {
-  name = "/aws/lambda/${aws_lambda_function.cleanup_youtube_link_lambda_function.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.cleanup_youtube_link_lambda_function.function_name}"
   retention_in_days = 7
 }
 
@@ -311,17 +313,17 @@ resource "aws_api_gateway_resource" "random_agw_resource" {
 }
 
 resource "aws_api_gateway_method" "random_agw_options_method" {
-  rest_api_id   =  aws_api_gateway_rest_api.zerotube_agw.id
+  rest_api_id   = aws_api_gateway_rest_api.zerotube_agw.id
   resource_id   = aws_api_gateway_resource.random_agw_resource.id
   http_method   = "OPTIONS"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_method_response" "random_agw_options_200" {
-  rest_api_id   = aws_api_gateway_rest_api.zerotube_agw.id
-  resource_id   = aws_api_gateway_resource.random_agw_resource.id
-  http_method   = aws_api_gateway_method.random_agw_options_method.http_method
-  status_code   = "200"
+  rest_api_id = aws_api_gateway_rest_api.zerotube_agw.id
+  resource_id = aws_api_gateway_resource.random_agw_resource.id
+  http_method = aws_api_gateway_method.random_agw_options_method.http_method
+  status_code = "200"
 
   response_models = {
     "application/json" = "Empty"
@@ -330,31 +332,31 @@ resource "aws_api_gateway_method_response" "random_agw_options_200" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = false,
     "method.response.header.Access-Control-Allow-Methods" = false,
-    "method.response.header.Access-Control-Allow-Origin" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
   }
 
   depends_on = [aws_api_gateway_method.random_agw_options_method]
 }
 
 resource "aws_api_gateway_integration" "random_agw_options_integration" {
-  rest_api_id   = aws_api_gateway_rest_api.zerotube_agw.id
-  resource_id   = aws_api_gateway_resource.random_agw_resource.id
-  http_method   = aws_api_gateway_method.random_agw_options_method.http_method
-  type          = "MOCK"
+  rest_api_id = aws_api_gateway_rest_api.zerotube_agw.id
+  resource_id = aws_api_gateway_resource.random_agw_resource.id
+  http_method = aws_api_gateway_method.random_agw_options_method.http_method
+  type        = "MOCK"
 
   depends_on = [aws_api_gateway_method.random_agw_options_method]
 }
 
 resource "aws_api_gateway_integration_response" "random_agw_options_integration_response" {
-  rest_api_id   = aws_api_gateway_rest_api.zerotube_agw.id
-  resource_id   = aws_api_gateway_resource.random_agw_resource.id
-  http_method   = aws_api_gateway_method.random_agw_options_method.http_method
-  status_code   = aws_api_gateway_method_response.random_agw_options_200.status_code
+  rest_api_id = aws_api_gateway_rest_api.zerotube_agw.id
+  resource_id = aws_api_gateway_resource.random_agw_resource.id
+  http_method = aws_api_gateway_method.random_agw_options_method.http_method
+  status_code = aws_api_gateway_method_response.random_agw_options_200.status_code
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'",
-    "method.response.header.Access-Control-Allow-Origin" = "'http://www.zerotube.org.s3-website-eu-west-1.amazonaws.com/'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'http://www.zerotube.org.s3-website-eu-west-1.amazonaws.com/'"
   }
 
   depends_on = [aws_api_gateway_method_response.random_agw_options_200]
@@ -378,15 +380,15 @@ resource "aws_api_gateway_integration" "random_agw_get_method_lambda_integration
 }
 
 resource "aws_api_gateway_method_response" "random_agw_get_200" {
-  rest_api_id   = aws_api_gateway_rest_api.zerotube_agw.id
-  resource_id   = aws_api_gateway_resource.random_agw_resource.id
-  http_method   = aws_api_gateway_method.random_agw_get_method.http_method
-  status_code   = "200"
+  rest_api_id = aws_api_gateway_rest_api.zerotube_agw.id
+  resource_id = aws_api_gateway_resource.random_agw_resource.id
+  http_method = aws_api_gateway_method.random_agw_get_method.http_method
+  status_code = "200"
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = true,
     "method.response.header.Access-Control-Allow-Methods" = true,
-    "method.response.header.Access-Control-Allow-Origin" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
   }
 
   depends_on = [aws_api_gateway_method.random_agw_options_method]
