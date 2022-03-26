@@ -1,21 +1,25 @@
-// Route 53 and CloudFront resources are made and managed manually (not via a Terraform script)
-
 terraform {
   backend "s3" {
-    bucket  = "conway-terraform-states"
-    key     = "zerotube"
-    region  = "eu-west-1"
-    profile = "default"
+  }
+
+  required_providers {
+    aws = "~> 3.74.1"
   }
 }
 
 provider "aws" {
   profile = "default"
-  region  = var.aws_region
+  region  = var.region
 }
 
-data "aws_ssm_parameter" "YOUTUBE_API_TOKEN" {
-  name = "/zerotube/YOUTUBE_API_TOKEN"
+resource "aws_ssm_parameter" "youtube_api_token" {
+  name  = "/zerotube/YOUTUBE_API_TOKEN"
+  type  = "SecureString"
+  value = var.youtube_api_token
+
+  tags = {
+    project = "zerotube"
+  }
 }
 
 resource "aws_s3_bucket" "zerotube-site-logs" {
@@ -37,7 +41,7 @@ resource "aws_s3_bucket" "zerotube-site" {
   }
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
@@ -67,7 +71,7 @@ resource "aws_s3_bucket" "zerotube-site-subdomain" {
   }
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
@@ -83,7 +87,7 @@ resource "aws_dynamodb_table" "zerotube_db" {
   }
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
@@ -107,7 +111,7 @@ resource "aws_iam_role" "lambda_function_iam_role" {
 EOF
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
@@ -160,13 +164,13 @@ resource "aws_lambda_function" "create_youtube_links_lambda_function" {
     variables = {
       SEARCH_TERMS       = var.youtube_search_terms
       MAXIMUM_VIEW_COUNT = var.youtube_max_view_count
-      YOUTUBE_API_TOKEN  = data.aws_ssm_parameter.YOUTUBE_API_TOKEN.value
+      YOUTUBE_API_TOKEN  = aws_ssm_parameter.youtube_api_token.value
       DYNAMO_TABLE_NAME  = aws_dynamodb_table.zerotube_db.name
     }
   }
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
@@ -191,7 +195,7 @@ resource "aws_lambda_function" "get_random_youtube_link_lambda_function" {
   }
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
@@ -213,12 +217,12 @@ resource "aws_lambda_function" "cleanup_youtube_link_lambda_function" {
     variables = {
       DYNAMO_TABLE_NAME  = aws_dynamodb_table.zerotube_db.name
       MAXIMUM_VIEW_COUNT = var.youtube_max_view_count
-      YOUTUBE_API_TOKEN  = data.aws_ssm_parameter.YOUTUBE_API_TOKEN.value
+      YOUTUBE_API_TOKEN  = aws_ssm_parameter.youtube_api_token.value
     }
   }
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
@@ -302,7 +306,7 @@ resource "aws_api_gateway_rest_api" "zerotube_agw" {
   description = "API for ZeroTube website"
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
@@ -356,7 +360,7 @@ resource "aws_api_gateway_integration_response" "random_agw_options_integration_
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'",
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://www.zerotube.org.s3-website-eu-west-1.amazonaws.com/'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'http://www.${var.domain_name}.s3-website-${var.region}.amazonaws.com/'"
   }
 
   depends_on = [aws_api_gateway_method_response.random_agw_options_200]
@@ -421,7 +425,7 @@ resource "aws_api_gateway_stage" "agw_stage" {
   stage_name    = "zerotube"
 
   tags = {
-    project = "ZeroTube"
+    project = "zerotube"
   }
 }
 
