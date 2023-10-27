@@ -25,6 +25,15 @@ resource "aws_ssm_parameter" "youtube_api_token" {
 resource "aws_s3_bucket" "zerotube-site-logs" {
   bucket = "${var.domain_name}-site-logs"
   acl    = "log-delivery-write"
+
+  server_side_encryption_configuration {
+    rule {
+      bucket_key_enabled = false
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket" "zerotube-site" {
@@ -38,6 +47,15 @@ resource "aws_s3_bucket" "zerotube-site" {
 
   website {
     index_document = "index.html"
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      bucket_key_enabled = false
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
   }
 
   tags = {
@@ -70,6 +88,15 @@ resource "aws_s3_bucket" "zerotube-site-subdomain" {
     redirect_all_requests_to = "www.${var.domain_name}"
   }
 
+  server_side_encryption_configuration {
+    rule {
+      bucket_key_enabled = false
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
   tags = {
     project = "zerotube"
   }
@@ -95,20 +122,20 @@ resource "aws_iam_role" "lambda_function_iam_role" {
   name = "populate-youtube-links-lambda-function-iam-role"
 
   assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "lambda.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+  }
+  EOF
 
   tags = {
     project = "zerotube"
@@ -126,8 +153,8 @@ resource "aws_iam_policy" "lambda_function_iam_role_policy" {
             "Sid": "AllowLogging",
             "Action": [
                 "logs:CreateLogGroup",
-                 "logs:CreateLogStream",
-                 "logs:PutLogEvents"
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
             ],
             "Effect": "Allow",
             "Resource": "arn:aws:logs:*:*:*"
