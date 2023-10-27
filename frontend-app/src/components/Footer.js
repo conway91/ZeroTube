@@ -7,14 +7,14 @@ class Footer extends Component {
         return (
             <div className="footer-container container">
                 <span>
-                    <a href="/">Home</a>
+                    <span className="change-state" onClick={()=> changeState("video")}>Home</span>
                     <span className="divider">|</span>
                     <span className="change-state" onClick={()=> changeState("about")}>About</span>
                     <span className="divider">|</span>
                     <a href="https://github.com/conway91/ZeroTube" target="_blank" rel="noreferrer">GitHub</a>
                 </span>
                 <br />
-                <p>2021</p>
+                <p>2022</p>
             </div>
         );
     }

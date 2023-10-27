@@ -3,6 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -10,15 +15,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
-	"log"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type YouTubeModel struct {
-	Id string
-	VideoId string
+	Id        string
+	VideoId   string
 	ViewCount string
 }
 
@@ -38,7 +39,7 @@ func getAllDynamoEntriesByVideoId(dynamoClient *dynamodb.DynamoDB) map[string]Yo
 	log.Printf("Getting all entries from dynamo table : '%s'", tableName)
 
 	result, err := dynamoClient.Scan(&dynamodb.ScanInput{
-		TableName:                 aws.String(tableName),
+		TableName: aws.String(tableName),
 	})
 	HandleError(err)
 
@@ -52,6 +53,8 @@ func getAllDynamoEntriesByVideoId(dynamoClient *dynamodb.DynamoDB) map[string]Yo
 		youtubeModels[youtubeModel.VideoId] = youtubeModel
 	}
 
+	log.Printf("Total entries : '%v'", len(youtubeModels))
+
 	return youtubeModels
 }
 
@@ -63,7 +66,7 @@ func deleteYouTubeVideoIdsByViews(youTubeModels map[string]YouTubeModel, youTube
 		videoIds = append(videoIds, entry.VideoId)
 	}
 
-	formattedVideoIds := strings.Join(videoIds[:],",")
+	formattedVideoIds := strings.Join(videoIds[:], ",")
 	maxViewCount, err := strconv.ParseUint(os.Getenv("MAXIMUM_VIEW_COUNT"), 10, 64)
 	HandleError(err)
 
@@ -73,6 +76,8 @@ func deleteYouTubeVideoIdsByViews(youTubeModels map[string]YouTubeModel, youTube
 
 	serviceVideoCallResponse, err := serviceVideoCall.Do()
 	HandleError(err)
+
+	log.Printf("YouTube API returned '%v' videos", len(serviceVideoCallResponse.Items))
 
 	var dynamoIdsToDelete []string
 	for _, item := range serviceVideoCallResponse.Items {

@@ -6,7 +6,6 @@ class About extends Component {
         return (
             <div className="about-container container">
                 <p>Hello. ZeroTube was created as a passion project for finding some of the more obscure and unkown YouTube videos; ones without views!</p>
-                <p>The about page requires more fleshing out TODO</p>
             </div>
         );
     }
