@@ -14,7 +14,7 @@ class Footer extends Component {
                     <a href="https://github.com/conway91/ZeroTube" target="_blank" rel="noreferrer">GitHub</a>
                 </span>
                 <br />
-                <p>2022</p>
+                <p>2023</p>
             </div>
         );
     }
